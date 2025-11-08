@@ -16,16 +16,18 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // todo, status, userId
+    private Long customerId;
 
     @Builder
-    private Order(Long id) {
+    private Order(Long id, Long customerId) {
         this.id = id;
+        this.customerId = customerId;
     }
 
-    public static Order create() {
+    public static Order create(Long customerId) {
         return Order.builder()
                 .id(null)
+                .customerId(customerId)
                 .build();
     }
 }

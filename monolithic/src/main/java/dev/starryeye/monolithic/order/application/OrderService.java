@@ -24,7 +24,7 @@ public class OrderService {
     @Transactional
     public void placeOrder(PlaceOrderCommand command) {
 
-        Order order = Order.create();
+        Order order = Order.create(command.userId());
         orderRepository.save(order);
 
         Long totalPrice = 0L;
