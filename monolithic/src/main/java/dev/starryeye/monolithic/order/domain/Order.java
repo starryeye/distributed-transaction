@@ -16,6 +16,8 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // todo, status, userId
+
     @Builder
     private Order(Long id) {
         this.id = id;
