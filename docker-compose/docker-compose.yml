@@ -1,0 +1,18 @@
+# docker compose -p order-services up -d
+services:
+  order-database-service:
+    container_name: order-mysql-container
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: secret-root
+      MYSQL_DATABASE: order-db
+      MYSQL_USER: user-app
+      MYSQL_PASSWORD: secret-app
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    ports:
+      - 3306:3306
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping"]
+      interval: 10s
+      retries: 10
