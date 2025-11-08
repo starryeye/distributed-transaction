@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "order_items")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class OrderItem {
+public class OrderItem { // 주문 상세
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
