@@ -21,6 +21,14 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
 
+    /**
+     * 주문 API 의 따닥 문제 해결법..
+     * 1. 주문 생성과 주문 처리를 하나의 API 에서 처리하면..
+     *      주문 데이터 자체를 대표하는 하나의 해싱 키를 만들어 중복 필터링을 해야한다.
+     * 2. 주문 생성, 주문 처리를 두개의 API 로 나누고
+     *      주문 처리 시, 주문 아이디(주문 생성 결과)를 필요하도록 하면 따닥 문제를 회피할 수 있다.
+     */
+
     @Transactional
     public void placeOrder(PlaceOrderCommand command) {
 
