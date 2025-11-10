@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/order-db
+    url: jdbc:mysql://localhost:3306/monolithic-db
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: user-app
     password: secret-app

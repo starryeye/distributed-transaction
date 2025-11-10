@@ -1,0 +1,27 @@
+# docker compose -p monolithic-3-services up -d
+services:
+  monolithic-3-database-service:
+    container_name: monolithic-3-mysql-container
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: secret-root
+      MYSQL_DATABASE: monolithic-db
+      MYSQL_USER: user-app
+      MYSQL_PASSWORD: secret-app
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    ports:
+      - 3306:3306
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping"]
+      interval: 10s
+      retries: 10
+  monolithic-3-cache-service:
+    container_name: monolithic-redis-container
+    image: redis
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      retries: 10
