@@ -27,20 +27,16 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
 
     /**
-     * 현재 OrderController::placeOrder 는 따닥 문제 가능성이 있다.
+     * monolithic-1 에 비하여 따닥 문제가 발생할 가능성이 줄어들긴 했지만..
+     * 현재 OrderController::placeOrder 는 따닥 문제 가능성이 "여전히" 있다.
      * - 동일한 주문이 동시에 요청되면 필터링되지 않고 중복 처리가 된다.
      *
-     * 주문 API 의 따닥 문제 해결법..
-     * 1. 주문 생성과 주문 처리(결제, 재고차감 등)를 하나의 API 에서 처리하려면..
-     *      주문 데이터(요청) 자체를 대표하는 하나의 해싱 키를 만들어 중복 필터링을 해야한다.
-     * 2. 주문 생성, 주문 처리(결제, 재고차감 등)를 두개의 API 로 나누고
-     *      주문 처리 시, 주문 아이디(주문 생성 결과)를 필요하도록 하면 따닥 문제를 회피할 수 있다.
+     * 이유는..
+     *      DB 의 두번의 갱신 분실 문제(second lost updates problem) 이다.
      *
-     * 참고
-     * 커머스 서비스에서 가장 대표적인 flow 는 2번이다.
-     * 장바구니 페이지와 결제 페이지를 나누고..
-     *      장바구니 페이지에서 결제 페이지 넘어갈때 주문 생성
-     *      결제 페이지에서 결제할때 주문 처리
+     * 해결법..
+     *      락 도입이 필요하다.
+     *      낙관적 락, 비관적 락, redis cache 를 이용한 락.. 등등..
      */
 
     @Transactional
