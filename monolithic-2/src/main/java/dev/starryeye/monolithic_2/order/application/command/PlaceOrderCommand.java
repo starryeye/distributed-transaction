@@ -1,15 +1,7 @@
 package dev.starryeye.monolithic_2.order.application.command;
 
-import java.util.List;
-
 public record PlaceOrderCommand(
         Long userId,
-        List<OrderItem> orderItems
+        Long orderId
 ) {
-
-    public record OrderItem(
-            Long productId,
-            Long orderQuantity
-    ) {
-    }
 }

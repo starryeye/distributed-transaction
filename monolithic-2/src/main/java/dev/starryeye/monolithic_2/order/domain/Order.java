@@ -18,16 +18,34 @@ public class Order {
 
     private Long customerId;
 
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
     @Builder
-    private Order(Long id, Long customerId) {
+    private Order(Long id, Long customerId, Status status) {
         this.id = id;
         this.customerId = customerId;
+        this.status = status;
     }
 
     public static Order create(Long customerId) {
         return Order.builder()
                 .id(null)
                 .customerId(customerId)
+                .status(Status.CREATED)
                 .build();
+    }
+
+    public boolean isComplete() {
+        return status == Status.COMPLETED;
+    }
+
+    public void complete() {
+        status = Status.COMPLETED;
+    }
+
+    private enum Status {
+        CREATED,
+        COMPLETED;
     }
 }

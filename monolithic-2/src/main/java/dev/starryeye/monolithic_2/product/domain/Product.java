@@ -42,7 +42,7 @@ public class Product {
     public void reduceStock(Long orderQuantity) {
 
         if (stockQuantity < orderQuantity) {
-            throw new RuntimeException("stock quantity exceeds stock quantity..");
+            throw new RuntimeException("stock quantity exceeds stock quantity, productId: " + this.id + ", orderQuantity: " + orderQuantity + ", stockQuantity: " + stockQuantity);
         }
 
         this.stockQuantity -= orderQuantity;

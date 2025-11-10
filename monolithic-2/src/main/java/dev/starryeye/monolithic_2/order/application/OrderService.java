@@ -1,15 +1,20 @@
 package dev.starryeye.monolithic_2.order.application;
 
+import dev.starryeye.monolithic_2.order.application.command.CreateOrderCommand;
 import dev.starryeye.monolithic_2.order.application.command.PlaceOrderCommand;
+import dev.starryeye.monolithic_2.order.application.result.CreateOrderResult;
 import dev.starryeye.monolithic_2.order.domain.Order;
 import dev.starryeye.monolithic_2.order.domain.OrderItem;
 import dev.starryeye.monolithic_2.order.infrastructure.OrderItemRepository;
 import dev.starryeye.monolithic_2.order.infrastructure.OrderRepository;
 import dev.starryeye.monolithic_2.point.application.PointService;
 import dev.starryeye.monolithic_2.product.application.ProductService;
+import dev.starryeye.monolithic_2.product.application.command.BuyProductCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -39,23 +44,42 @@ public class OrderService {
      */
 
     @Transactional
-    public void placeOrder(PlaceOrderCommand command) {
-
-        Order order = Order.create(command.userId()); // 주문 생성
+    public CreateOrderResult createOrder(CreateOrderCommand command) {
+        // 주문 생성
+        Order order = Order.create(command.userId());
         orderRepository.save(order);
 
-        Long totalPrice = 0L;
-        for (PlaceOrderCommand.OrderItem item : command.orderItems()) {
+        // 주문 상세 생성
+        List<OrderItem> orderItems = command.orderItems().stream()
+                .map(orderItemCommand -> OrderItem.create(order.getId(), orderItemCommand.productId(), orderItemCommand.orderQuantity()))
+                .toList();
+        orderItemRepository.saveAll(orderItems);
 
-            // todo, orderItemRepository::saveAll, productService::buyAll
+        return new CreateOrderResult(order.getId());
+    }
 
-            OrderItem orderItem = OrderItem.create(order.getId(), item.productId(), item.orderQuantity()); // 주문 상세 생성
-            orderItemRepository.save(orderItem);
+    @Transactional
+    public void placeOrder(PlaceOrderCommand command) {
 
-            Long price = productService.buy(item.productId(), item.orderQuantity()); // 주문 처리(재고 관리(차감))
-            totalPrice += price;
+        Order order = orderRepository.findById(command.orderId())
+                .orElseThrow(() -> new IllegalArgumentException("order not found, id: " + command.orderId()));
+
+        if (order.isComplete()) {
+            return;
         }
 
-        pointService.use(command.userId(), totalPrice); // 주문 처리(결제)
+        List<OrderItem> orderItems = orderItemRepository.findAllByOrderId(order.getId());
+
+        // 주문 처리(재고 관리(차감))
+        BuyProductCommand buyProductCommand = new BuyProductCommand(orderItems.stream()
+                .map(item -> new BuyProductCommand.Product(item.getProductId(), item.getOrderQuantity()))
+                .toList()
+        );
+        Long totalPrice = productService.buyAll(buyProductCommand);
+
+        // 주문 처리(결제)
+        pointService.use(command.userId(), totalPrice);
+
+        order.complete();
     }
 }

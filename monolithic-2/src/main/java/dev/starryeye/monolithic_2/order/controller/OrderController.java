@@ -1,7 +1,10 @@
 package dev.starryeye.monolithic_2.order.controller;
 
 import dev.starryeye.monolithic_2.order.application.OrderService;
+import dev.starryeye.monolithic_2.order.application.result.CreateOrderResult;
+import dev.starryeye.monolithic_2.order.controller.request.CreateOrderRequest;
 import dev.starryeye.monolithic_2.order.controller.request.PlaceOrderRequest;
+import dev.starryeye.monolithic_2.order.controller.response.CreateOrderResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,6 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderController {
 
     private final OrderService orderService;
+
+    @PostMapping("/order/new")
+    public CreateOrderResponse createOrder(
+            @RequestHeader("X-User-Id") Long userId,
+            @RequestBody CreateOrderRequest request
+    ) {
+        CreateOrderResult createOrderResult = orderService.createOrder(request.toCommand(userId));
+        return CreateOrderResponse.of(createOrderResult);
+    }
 
     @PostMapping("/order/place")
     public void placeOrder(
