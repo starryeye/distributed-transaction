@@ -22,9 +22,12 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
 
     /**
+     * 현재 OrderController::placeOrder 는 따닥 문제 가능성이 있다.
+     * - 동일한 주문이 동시에 요청되면 필터링되지 않고 중복 처리가 된다.
+     *
      * 주문 API 의 따닥 문제 해결법..
-     * 1. 주문 생성과 주문 처리(결제, 재고차감 등)를 하나의 API 에서 처리하면..
-     *      주문 데이터 자체를 대표하는 하나의 해싱 키를 만들어 중복 필터링을 해야한다.
+     * 1. 주문 생성과 주문 처리(결제, 재고차감 등)를 하나의 API 에서 처리하려면..
+     *      주문 데이터(요청) 자체를 대표하는 하나의 해싱 키를 만들어 중복 필터링을 해야한다.
      * 2. 주문 생성, 주문 처리(결제, 재고차감 등)를 두개의 API 로 나누고
      *      주문 처리 시, 주문 아이디(주문 생성 결과)를 필요하도록 하면 따닥 문제를 회피할 수 있다.
      *
@@ -38,7 +41,7 @@ public class OrderService {
     @Transactional
     public void placeOrder(PlaceOrderCommand command) {
 
-        Order order = Order.create(command.userId());
+        Order order = Order.create(command.userId()); // 주문 생성
         orderRepository.save(order);
 
         Long totalPrice = 0L;
@@ -46,13 +49,13 @@ public class OrderService {
 
             // todo, orderItemRepository::saveAll, productService::buyAll
 
-            OrderItem orderItem = OrderItem.create(order.getId(), item.productId(), item.orderQuantity());
+            OrderItem orderItem = OrderItem.create(order.getId(), item.productId(), item.orderQuantity()); // 주문 상세 생성
             orderItemRepository.save(orderItem);
 
-            Long price = productService.buy(item.productId(), item.orderQuantity());
+            Long price = productService.buy(item.productId(), item.orderQuantity()); // 주문 처리(재고 관리(차감))
             totalPrice += price;
         }
 
-        pointService.use(command.userId(), totalPrice);
+        pointService.use(command.userId(), totalPrice); // 주문 처리(결제)
     }
 }
