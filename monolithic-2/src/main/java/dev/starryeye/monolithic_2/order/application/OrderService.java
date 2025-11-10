@@ -27,7 +27,12 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
 
     /**
-     * monolithic-1 에 비하여 따닥 문제가 발생할 가능성이 줄어들긴 했지만..
+     * monolithic-1 에서는 시간차를 두고 중복 요청에도 문제가 발생하였지만 (동시성 문제도 존재)
+     * monolithic-2 에서는 api 를 두개로 분리하고 주문 status 확인 로직을 적용하여
+     *  사용자가 동일한 주문 번호로 시간차를 두고 중복요청을 하면 중복 주문 처리를 막을 수 있게 됨.
+     *
+     * 하지만, 동시에 주문 처리 api 를 호출하면 여전히 따닥 문제는 존재함..
+     * 
      * 현재 OrderController::placeOrder 는 따닥 문제 가능성이 "여전히" 있다.
      * - 동일한 주문이 동시에 요청되면 필터링되지 않고 중복 처리가 된다.
      *
