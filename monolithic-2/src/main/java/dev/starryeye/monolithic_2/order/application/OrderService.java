@@ -37,7 +37,8 @@ public class OrderService {
      * - 동일한 주문이 동시에 요청되면 필터링되지 않고 중복 처리가 된다.
      *
      * 이유는..
-     *      DB 의 두번의 갱신 분실 문제(second lost updates problem) 이다.
+     *      DB 의 두번의 갱신 분실 문제(second lost updates problem) 처럼
+     *      트랜잭션만으로 동시성 문제를 해결하지 못하는 상황이다.
      *
      * 해결법..
      *      락 도입이 필요하다.
