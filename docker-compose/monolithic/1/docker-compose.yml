@@ -1,7 +1,7 @@
 # docker compose -p monolithic-1-services up -d
 services:
-  monolithic-1-database-service:
-    container_name: monolithic-1-mysql-container
+  monolithic-database-service:
+    container_name: monolithic-mysql-container
     image: mysql
     environment:
       MYSQL_ROOT_PASSWORD: secret-root
