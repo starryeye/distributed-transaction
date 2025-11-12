@@ -31,7 +31,7 @@ public class OrderService {
      *  사용자가 동일한 주문 번호로 시간차를 두고 중복요청을 하면 중복 주문 처리를 막을 수 있게 되었지만..
      *  여전히, 동시성 문제가 존재한다.
      *
-     * 이를 redis 의 setnx 를 응용하여 락으로 해결해본다.
+     * 이를 redis 의 setnx 를 응용하여 분산락으로 해결해본다.
      * -> 구현 편의를 위해 OrderController 에서 처리함.
      */
 
