@@ -27,22 +27,12 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
 
     /**
-     * monolithic-1 에서는 시간차를 두고 중복 요청에도 문제가 발생하였지만 (동시성 문제도 존재)
      * monolithic-2 에서는 api 를 두개로 분리하고 주문 status 확인 로직을 적용하여
-     *  사용자가 동일한 주문 번호로 시간차를 두고 중복요청을 하면 중복 주문 처리를 막을 수 있게 됨.
+     *  사용자가 동일한 주문 번호로 시간차를 두고 중복요청을 하면 중복 주문 처리를 막을 수 있게 되었지만..
+     *  여전히, 동시성 문제가 존재한다.
      *
-     * 하지만, 동시에 주문 처리 api 를 호출하면 여전히 따닥 문제는 존재함..
-     * 
-     * 현재 OrderController::placeOrder 는 따닥 문제 가능성이 "여전히" 있다.
-     * - 동일한 주문이 동시에 요청되면 필터링되지 않고 중복 처리가 된다.
-     *
-     * 이유는..
-     *      DB 의 두번의 갱신 분실 문제(second lost updates problem) 처럼
-     *      트랜잭션만으로 동시성 문제를 해결하지 못하는 상황이다.
-     *
-     * 해결법..
-     *      락 도입이 필요하다.
-     *      낙관적 락, 비관적 락, redis cache 를 이용한 락.. 등등..
+     * 이를 redis 의 setnx 를 응용하여 락으로 해결해본다.
+     * -> 구현 편의를 위해 OrderController 에서 처리함.
      */
 
     @Transactional
@@ -83,5 +73,12 @@ public class OrderService {
         pointService.use(command.userId(), totalPrice);
 
         order.complete();
+
+        // 동시 요청 test 용
+//        try {
+//            Thread.sleep(3000);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 }

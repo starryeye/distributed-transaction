@@ -1,5 +1,6 @@
 package dev.starryeye.monolithic_3.order.controller;
 
+import dev.starryeye.monolithic_3.common.infrastructure.RedisDistributedLock;
 import dev.starryeye.monolithic_3.order.application.OrderService;
 import dev.starryeye.monolithic_3.order.application.result.CreateOrderResult;
 import dev.starryeye.monolithic_3.order.controller.request.CreateOrderRequest;
@@ -17,6 +18,8 @@ public class OrderController {
 
     private final OrderService orderService;
 
+    private final RedisDistributedLock lock;
+
     @PostMapping("/order/new")
     public CreateOrderResponse createOrder(
             @RequestHeader("X-User-Id") Long userId,
@@ -31,6 +34,17 @@ public class OrderController {
             @RequestHeader("X-User-Id") Long userId,
             @RequestBody PlaceOrderRequest request
     ) {
-        orderService.placeOrder(request.toCommand(userId));
+
+        Boolean acquiredLock = lock.tryLock("order:", String.valueOf(request.orderId()));
+
+        if (!acquiredLock) {
+            throw new RuntimeException("failed to acquire lock.. this is a duplicate request. another request is being processed..");
+        }
+
+        try {
+            orderService.placeOrder(request.toCommand(userId));
+        } finally {
+            lock.unlock("order:", String.valueOf(request.orderId()));
+        }
     }
 }
