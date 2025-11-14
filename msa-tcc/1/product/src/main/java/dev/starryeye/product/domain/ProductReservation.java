@@ -47,6 +47,14 @@ public class ProductReservation {
                 .build();
     }
 
+    public boolean isConfirmed() {
+        return this.status == ReservationStatus.CONFIRMED;
+    }
+
+    public boolean isReserved() {
+        return this.status == ReservationStatus.RESERVED;
+    }
+
     private enum ReservationStatus {
         RESERVED,
         CONFIRMED,

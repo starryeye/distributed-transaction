@@ -1,6 +1,7 @@
 package dev.starryeye.product.application;
 
 import dev.starryeye.product.application.command.ProductReserveCommand;
+import dev.starryeye.product.application.command.ProductReserveConfirmCommand;
 import dev.starryeye.product.application.result.ProductReserveResult;
 import dev.starryeye.product.domain.Product;
 import dev.starryeye.product.domain.ProductReservation;
@@ -22,11 +23,11 @@ public class ProductService {
     @Transactional
     public ProductReserveResult tryReserve(ProductReserveCommand command) {
 
-        List<ProductReservation> exists = productReservationRepository.findAllByReservationId(command.reservationId());
+        List<ProductReservation> reservations = productReservationRepository.findAllByReservationId(command.reservationId());
 
         // 예약 이미 존재
-        if (!exists.isEmpty()) {
-            long totalPrice = exists.stream()
+        if (!reservations.isEmpty()) {
+            long totalPrice = reservations.stream()
                     .mapToLong(ProductReservation::getReservedPrice)
                     .sum();
 
@@ -54,5 +55,25 @@ public class ProductService {
         }
 
         return new ProductReserveResult(totalPrice);
+    }
+
+    @Transactional
+    public void confirmReserve(ProductReserveConfirmCommand command) {
+
+        List<ProductReservation> reservations = productReservationRepository.findAllByReservationId(command.reservationId());
+
+        if (reservations.isEmpty()) {
+            throw new RuntimeException("reservation not found, id: " + command.reservationId());
+        }
+
+        List<ProductReservation> reservable = reservations.stream()
+                .filter(ProductReservation::isReserved)
+                .toList();
+
+        if (reservable.isEmpty()) {
+            throw new RuntimeException("reservable reservation not found, id: " + command.reservationId());
+        }
+
+        // todo
     }
 }
