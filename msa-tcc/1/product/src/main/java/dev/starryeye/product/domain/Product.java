@@ -22,12 +22,16 @@ public class Product {
 
     private Long reservedStockQuantity;
 
+    @Version
+    private Long version;
+
     @Builder
-    private Product(Long id, Long stockQuantity, Long price, Long reservedStockQuantity) {
+    private Product(Long id, Long stockQuantity, Long price, Long reservedStockQuantity, Long version) {
         this.id = id;
         this.stockQuantity = stockQuantity;
         this.price = price;
         this.reservedStockQuantity = reservedStockQuantity;
+        this.version = version;
     }
 
     public static Product create(Long stockQuantity, Long price) {
@@ -36,6 +40,7 @@ public class Product {
                 .stockQuantity(stockQuantity)
                 .price(price)
                 .reservedStockQuantity(0L)
+                .version(null)
                 .build();
     }
 

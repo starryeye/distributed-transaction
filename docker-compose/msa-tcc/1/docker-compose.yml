@@ -48,3 +48,12 @@ services:
       test: [ "CMD", "mysqladmin", "ping" ]
       interval: 10s
       retries: 10
+  cache-service:
+    container_name: redis-container
+    image: redis
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      retries: 10

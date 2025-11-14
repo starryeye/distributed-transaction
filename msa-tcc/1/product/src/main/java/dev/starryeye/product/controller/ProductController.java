@@ -22,6 +22,10 @@ public class ProductController {
     public ProductReserveResponse reserve(
             @RequestBody ProductReserveRequest request
     ) {
+        /**
+         * 모종의 이유로 동시에 동일한 reservationId 의 요청이 2회 이상 들어오면
+         * 막을 수 있도록 분산락을 적용하였다.
+         */
 
         Boolean acquiredLock = lock.tryLock("product_reservation:", String.valueOf(request.reservationId()));
 
