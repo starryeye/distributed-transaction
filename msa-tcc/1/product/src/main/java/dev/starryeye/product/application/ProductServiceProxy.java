@@ -16,6 +16,11 @@ public class ProductServiceProxy {
 
     public ProductReserveResult tryReserve(ProductReserveCommand command) {
 
+        /**
+         * 서로 다른 reservationId 를 가진 요청이지만, 동시에 같은 Product 를 업데이트하면
+         * 동시성 문제(두번 갱실 분실 문제)가 생길 수 있어서 낙관적 락을 적용하였다.
+         */
+
         int tryCount = 0;
 
         while (tryCount < TRY_COUNT) {
