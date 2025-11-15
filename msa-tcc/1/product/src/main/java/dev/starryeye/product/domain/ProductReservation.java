@@ -55,6 +55,10 @@ public class ProductReservation {
         return this.status == ReservationStatus.RESERVED;
     }
 
+    public boolean isCancelledOrConfirmed() {
+        return this.status == ReservationStatus.CANCELLED || this.status == ReservationStatus.CONFIRMED;
+    }
+
     public void confirm() {
 
         if (this.status == ReservationStatus.CANCELLED) {
@@ -62,6 +66,15 @@ public class ProductReservation {
         }
 
         this.status = ReservationStatus.CONFIRMED;
+    }
+
+    public void cancel() {
+
+        if (this.status == ReservationStatus.CONFIRMED) {
+            throw new IllegalStateException("product reservation has been confirm, reservationId: " + this.reservationId + ", productId: " + this.productId);
+        }
+
+        this.status = ReservationStatus.CANCELLED;
     }
 
     private enum ReservationStatus {

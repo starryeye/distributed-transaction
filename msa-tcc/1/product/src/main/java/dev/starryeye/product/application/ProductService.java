@@ -1,6 +1,7 @@
 package dev.starryeye.product.application;
 
 import dev.starryeye.product.application.command.ProductReserveCommand;
+import dev.starryeye.product.application.command.ReservedProductCancelCommand;
 import dev.starryeye.product.application.command.ReservedProductConfirmCommand;
 import dev.starryeye.product.application.result.ProductReserveResult;
 import dev.starryeye.product.domain.Product;
@@ -66,11 +67,11 @@ public class ProductService {
             throw new RuntimeException("reservation not found, id: " + command.reservationId());
         }
 
-        List<ProductReservation> reservable = reservations.stream()
-                .filter(ProductReservation::isReserved)
+        List<ProductReservation> cancelledOrConfirmedReservations = reservations.stream()
+                .filter(ProductReservation::isCancelledOrConfirmed)
                 .toList();
-        if (reservable.isEmpty()) {
-            throw new RuntimeException("reservable reservation not found, id: " + command.reservationId());
+        if (!cancelledOrConfirmedReservations.isEmpty()) {
+            throw new RuntimeException("there are cancelled or confirmed reservations, reservationId: " + command.reservationId());
         }
 
         for (ProductReservation reservation : reservations) {
@@ -79,6 +80,31 @@ public class ProductService {
 
             product.confirmReservedStock(reservation.getReservedStockQuantity());
             reservation.confirm();
+        }
+    }
+
+    @Transactional
+    public void cancelReserve(ReservedProductCancelCommand command) {
+
+        List<ProductReservation> reservations = productReservationRepository.findAllByReservationId(command.reservationId());
+
+        if (reservations.isEmpty()) {
+            throw new RuntimeException("reservation not found, id: " + command.reservationId());
+        }
+
+        List<ProductReservation> cancelledOrConfirmedReservations = reservations.stream()
+                .filter(ProductReservation::isCancelledOrConfirmed)
+                .toList();
+        if (!cancelledOrConfirmedReservations.isEmpty()) {
+            throw new RuntimeException("there are cancelled or confirmed reservations, reservationId: " + command.reservationId());
+        }
+
+        for (ProductReservation reservation : reservations) {
+            Product product = productRepository.findById(reservation.getProductId())
+                    .orElseThrow(() -> new RuntimeException("product not found, id: " + reservation.getProductId()));
+
+            product.cancelReservedStock(reservation.getReservedStockQuantity());
+            reservation.cancel();
         }
     }
 }

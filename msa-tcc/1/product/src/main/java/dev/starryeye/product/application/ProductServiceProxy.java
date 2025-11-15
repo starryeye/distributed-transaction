@@ -1,6 +1,7 @@
 package dev.starryeye.product.application;
 
 import dev.starryeye.product.application.command.ProductReserveCommand;
+import dev.starryeye.product.application.command.ReservedProductCancelCommand;
 import dev.starryeye.product.application.command.ReservedProductConfirmCommand;
 import dev.starryeye.product.application.result.ProductReserveResult;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,22 @@ public class ProductServiceProxy {
         while (tryCount < TRY_COUNT) {
             try {
                 productService.confirmReserve(command);
+                return;
+            } catch (ObjectOptimisticLockingFailureException e) {
+                tryCount++;
+            }
+        }
+
+        throw new RuntimeException("failed to reserve product.. failed to acquire optimistic lock..");
+    }
+
+    public void cancelReserve(ReservedProductCancelCommand command) {
+
+        int tryCount = 0;
+
+        while (tryCount < TRY_COUNT) {
+            try {
+                productService.cancelReserve(command);
                 return;
             } catch (ObjectOptimisticLockingFailureException e) {
                 tryCount++;

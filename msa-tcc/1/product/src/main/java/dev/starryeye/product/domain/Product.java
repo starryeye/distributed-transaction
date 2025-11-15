@@ -58,7 +58,7 @@ public class Product {
     }
 
     public void reserveStock(Long requestReserveStockQuantity) {
-        // 상품 재고 예약
+        // 상품 재고 예약을 한다.
 
         long reservableStockQuantity = this.stockQuantity - this.reservedStockQuantity;
 
@@ -70,7 +70,7 @@ public class Product {
     }
 
     public void confirmReservedStock(Long requestConfirmStockQuantity) {
-        // 상품 재고 예약 확정 -> 재고 및 예약 재고 감소
+        // 상품 재고 예약 확정을 한다. (재고 및 예약 재고 감소)
 
         if (this.stockQuantity < requestConfirmStockQuantity) {
             throw new RuntimeException("requestConfirmStockQuantity exceeds stock quantity, productId: " + this.id + ", requestConfirmStockQuantity: " + requestConfirmStockQuantity + ", stockQuantity: " + stockQuantity);
@@ -82,5 +82,15 @@ public class Product {
 
         this.stockQuantity -= requestConfirmStockQuantity;
         this.reservedStockQuantity -= requestConfirmStockQuantity;
+    }
+
+    public void cancelReservedStock(Long requestCancelStockQuantity) {
+        // 상품 재고 예약 취소를 한다. (예약 재고 감소)
+
+        if (this.reservedStockQuantity < requestCancelStockQuantity) {
+            throw new RuntimeException("requestCancelStockQuantity exceeds reservedStockQuantity, productId: " + this.id + ", requestCancelStockQuantity: " + requestCancelStockQuantity + ", reservedStockQuantity: " + reservedStockQuantity);
+        }
+
+        this.reservedStockQuantity -= requestCancelStockQuantity;
     }
 }
