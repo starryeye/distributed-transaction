@@ -55,6 +55,15 @@ public class ProductReservation {
         return this.status == ReservationStatus.RESERVED;
     }
 
+    public void confirm() {
+
+        if (this.status == ReservationStatus.CANCELLED) {
+            throw new IllegalStateException("product reservation has been cancelled, reservationId: " + this.reservationId + ", productId: " + this.productId);
+        }
+
+        this.status = ReservationStatus.CONFIRMED;
+    }
+
     private enum ReservationStatus {
         RESERVED,
         CONFIRMED,

@@ -1,7 +1,7 @@
 package dev.starryeye.product.application;
 
 import dev.starryeye.product.application.command.ProductReserveCommand;
-import dev.starryeye.product.application.command.ProductReserveConfirmCommand;
+import dev.starryeye.product.application.command.ReservedProductConfirmCommand;
 import dev.starryeye.product.application.result.ProductReserveResult;
 import dev.starryeye.product.domain.Product;
 import dev.starryeye.product.domain.ProductReservation;
@@ -27,38 +27,38 @@ public class ProductService {
 
         // 예약 이미 존재
         if (!reservations.isEmpty()) {
-            long totalPrice = reservations.stream()
+            long totalReservePrice = reservations.stream()
                     .mapToLong(ProductReservation::getReservedPrice)
                     .sum();
 
-            return new ProductReserveResult(totalPrice);
+            return new ProductReserveResult(totalReservePrice);
         }
 
-        // 예약이 없음, 예약 생성
-        Long totalPrice = 0L;
+        // 예약이 없음, 각 Product 별 예약 생성
+        Long totalReservePrice = 0L;
         for (ProductReserveCommand.ReserveItem reserveItem : command.items()) {
             Product product = productRepository.findById(reserveItem.productId())
                     .orElseThrow(() -> new RuntimeException("product not found, id: " + reserveItem.productId()));
 
             product.reserveStock(reserveItem.reserveStockQuantity());
-            Long price = product.getPriceFor(reserveItem.reserveStockQuantity());
-            totalPrice += price;
+            Long reservePrice = product.getPriceFor(reserveItem.reserveStockQuantity());
+            totalReservePrice += reservePrice;
 
             ProductReservation productReservation = ProductReservation.create(
                     command.reservationId(),
                     product.getId(),
                     reserveItem.reserveStockQuantity(),
-                    price
+                    reservePrice
             );
 
             productReservationRepository.save(productReservation);
         }
 
-        return new ProductReserveResult(totalPrice);
+        return new ProductReserveResult(totalReservePrice);
     }
 
     @Transactional
-    public void confirmReserve(ProductReserveConfirmCommand command) {
+    public void confirmReserve(ReservedProductConfirmCommand command) {
 
         List<ProductReservation> reservations = productReservationRepository.findAllByReservationId(command.reservationId());
 
@@ -69,11 +69,16 @@ public class ProductService {
         List<ProductReservation> reservable = reservations.stream()
                 .filter(ProductReservation::isReserved)
                 .toList();
-
         if (reservable.isEmpty()) {
             throw new RuntimeException("reservable reservation not found, id: " + command.reservationId());
         }
 
-        // todo
+        for (ProductReservation reservation : reservations) {
+            Product product = productRepository.findById(reservation.getProductId())
+                    .orElseThrow(() -> new RuntimeException("product not found, id: " + reservation.getProductId()));
+
+            product.confirmReservedStock(reservation.getReservedStockQuantity());
+            reservation.confirm();
+        }
     }
 }

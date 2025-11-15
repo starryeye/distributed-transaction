@@ -50,14 +50,15 @@ public class Product {
 
     public void reduceStock(Long orderQuantity) {
 
-        if (stockQuantity < orderQuantity) {
-            throw new RuntimeException("stock quantity exceeds stock quantity, productId: " + this.id + ", orderQuantity: " + orderQuantity + ", stockQuantity: " + stockQuantity);
+        if (this.stockQuantity < orderQuantity) {
+            throw new RuntimeException("orderQuantity exceeds stock quantity, productId: " + this.id + ", orderQuantity: " + orderQuantity + ", stockQuantity: " + stockQuantity);
         }
 
         this.stockQuantity -= orderQuantity;
     }
 
     public void reserveStock(Long requestReserveStockQuantity) {
+        // 상품 재고 예약
 
         long reservableStockQuantity = this.stockQuantity - this.reservedStockQuantity;
 
@@ -66,5 +67,20 @@ public class Product {
         }
 
         this.reservedStockQuantity += requestReserveStockQuantity;
+    }
+
+    public void confirmReservedStock(Long requestConfirmStockQuantity) {
+        // 상품 재고 예약 확정 -> 재고 및 예약 재고 감소
+
+        if (this.stockQuantity < requestConfirmStockQuantity) {
+            throw new RuntimeException("requestConfirmStockQuantity exceeds stock quantity, productId: " + this.id + ", requestConfirmStockQuantity: " + requestConfirmStockQuantity + ", stockQuantity: " + stockQuantity);
+        }
+
+        if (this.reservedStockQuantity < requestConfirmStockQuantity) {
+            throw new RuntimeException("requestConfirmStockQuantity exceeds reservedStockQuantity, productId: " + this.id + ", requestConfirmStockQuantity: " + requestConfirmStockQuantity + ", reservedStockQuantity: " + reservedStockQuantity);
+        }
+
+        this.stockQuantity -= requestConfirmStockQuantity;
+        this.reservedStockQuantity -= requestConfirmStockQuantity;
     }
 }
