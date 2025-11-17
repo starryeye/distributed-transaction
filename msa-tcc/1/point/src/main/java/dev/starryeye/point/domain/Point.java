@@ -26,26 +26,30 @@ public class Point {
     private Long version;
 
     @Builder
-    private Point(Long id, Long userId, Long balance) {
+    private Point(Long id, Long userId, Long balance, Long reservedBalance, Long version) {
         this.id = id;
         this.userId = userId;
         this.balance = balance;
+        this.reservedBalance = reservedBalance;
+        this.version = version;
     }
 
-    public static Point create(Long userId, Long balance) {
+    public static Point create(Long userId, Long balance, Long reservedBalance) {
         return Point.builder()
                 .id(null)
                 .userId(userId)
                 .balance(balance)
+                .reservedBalance(reservedBalance)
+                .version(null)
                 .build();
     }
 
-    public void reduce(Long useAmount) {
+    public void reduce(Long useBalance) {
 
-        if (this.balance < useAmount) {
-            throw new RuntimeException("not enough point balance..");
+        if (this.balance < useBalance) {
+            throw new RuntimeException("not enough point balance, pointId: " + this.id + ", balance: " + this.balance + ", useBalance: " + useBalance);
         }
-        this.balance -= useAmount;
+        this.balance -= useBalance;
     }
 
     public void reserveBalance(Long requestReserveBalance) {
@@ -53,9 +57,23 @@ public class Point {
         long reservableBalance = this.balance - this.reservedBalance;
 
         if (reservableBalance < requestReserveBalance) {
-            throw new RuntimeException("not enough point balance..");
+            throw new RuntimeException("not enough point balance, pointId: " + this.id + ", balance: " + this.balance + ", reservedBalance: " + this.reservedBalance + ", requestReserveBalance: " + requestReserveBalance);
         }
 
         this.reservedBalance += requestReserveBalance;
+    }
+
+    public void confirmReservedBalance(Long requestConfirmBalance) {
+
+        if (this.balance < requestConfirmBalance) {
+            throw new RuntimeException("not enough point balance, pointId: " + this.id + ", balance: " + this.balance + ", reservedBalance: " + reservedBalance + ", requestConfirmBalance: " + requestConfirmBalance);
+        }
+
+        if (this.reservedBalance < requestConfirmBalance) {
+            throw new RuntimeException("not enough point reservedBalance, pointId: " + this.id + ", balance: " + this.balance + ", reservedBalance: " + reservedBalance + ", requestConfirmBalance: " + requestConfirmBalance);
+        }
+
+        this.balance -= requestConfirmBalance;
+        this.reservedBalance -= requestConfirmBalance;
     }
 }

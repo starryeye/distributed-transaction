@@ -46,6 +46,19 @@ public class PointReservation {
                 .build();
     }
 
+    public boolean isNotReserved() {
+        return this.status != ReservationStatus.RESERVED;
+    }
+
+    public void confirm() {
+
+        if (this.status == ReservationStatus.CANCELLED) {
+            throw new IllegalStateException("point reservation has been cancelled, reservationId: " + this.reservationId + ", pointId: " + this.pointId);
+        }
+
+        this.status = ReservationStatus.CONFIRMED;
+    }
+
     private enum ReservationStatus {
         RESERVED,
         CONFIRMED,

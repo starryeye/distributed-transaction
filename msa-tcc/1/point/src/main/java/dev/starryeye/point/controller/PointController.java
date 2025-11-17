@@ -1,8 +1,10 @@
 package dev.starryeye.point.controller;
 
 import dev.starryeye.point.application.PointService;
+import dev.starryeye.point.application.PointServiceProxy;
 import dev.starryeye.point.common.infrastructure.RedisDistributedLock;
 import dev.starryeye.point.controller.request.PointReserveRequest;
+import dev.starryeye.point.controller.request.ReservedPointConfirmRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class PointController {
 
-    private final PointService pointService;
+    private final PointServiceProxy pointService;
 
     private final RedisDistributedLock lock;
 
@@ -35,5 +37,10 @@ public class PointController {
         } finally {
             lock.unlock("point_reservation:", request.reservationId());
         }
+    }
+
+    @PostMapping("/point/confirm")
+    public void confirm(@RequestBody ReservedPointConfirmRequest request) {
+        pointService.confirmReserve(request.toCommand());
     }
 }

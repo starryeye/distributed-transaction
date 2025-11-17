@@ -1,6 +1,7 @@
 package dev.starryeye.point.application;
 
 import dev.starryeye.point.application.command.PointReserveCommand;
+import dev.starryeye.point.application.command.ReservedPointConfirmCommand;
 import dev.starryeye.point.domain.Point;
 import dev.starryeye.point.domain.PointReservation;
 import dev.starryeye.point.infrastructure.PointRepository;
@@ -35,5 +36,23 @@ public class PointService {
                 command.reserveBalance()
         );
         pointReservationRepository.save(pointReservation);
+    }
+
+    @Transactional
+    public void confirmReserve(ReservedPointConfirmCommand command) {
+
+        PointReservation reservation = pointReservationRepository.findByReservationId(command.reservationId())
+                .orElseThrow(() -> new RuntimeException("reservation not found, reservationId: " + command.reservationId()));
+
+        if (reservation.isNotReserved()) {
+            System.out.println("there are cancelled or confirmed reservations, reservationId: " + command.reservationId());
+            return;
+        }
+
+        Point point = pointRepository.findById(reservation.getPointId())
+                .orElseThrow(() -> new RuntimeException("point not found, pointId: " + reservation.getPointId()));
+
+        point.confirmReservedBalance(reservation.getReservedBalance());
+        reservation.confirm();
     }
 }

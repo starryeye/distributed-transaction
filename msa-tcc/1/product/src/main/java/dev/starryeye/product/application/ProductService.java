@@ -64,14 +64,15 @@ public class ProductService {
         List<ProductReservation> reservations = productReservationRepository.findAllByReservationId(command.reservationId());
 
         if (reservations.isEmpty()) {
-            throw new RuntimeException("reservation not found, id: " + command.reservationId());
+            throw new RuntimeException("reservation not found, reservationId: " + command.reservationId());
         }
 
         List<ProductReservation> cancelledOrConfirmedReservations = reservations.stream()
                 .filter(ProductReservation::isCancelledOrConfirmed)
                 .toList();
         if (!cancelledOrConfirmedReservations.isEmpty()) {
-            throw new RuntimeException("there are cancelled or confirmed reservations, reservationId: " + command.reservationId());
+            System.out.println("there are cancelled or confirmed reservations, reservationId: " + command.reservationId());
+            return;
         }
 
         for (ProductReservation reservation : reservations) {
@@ -89,7 +90,7 @@ public class ProductService {
         List<ProductReservation> reservations = productReservationRepository.findAllByReservationId(command.reservationId());
 
         if (reservations.isEmpty()) {
-            throw new RuntimeException("reservation not found, id: " + command.reservationId());
+            throw new RuntimeException("reservation not found, reservationId: " + command.reservationId());
         }
 
         List<ProductReservation> cancelledOrConfirmedReservations = reservations.stream()
