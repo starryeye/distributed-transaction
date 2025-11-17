@@ -20,6 +20,8 @@ public class Point {
 
     private Long balance; // 포인트 잔액
 
+    private Long reservedBalance;
+
     @Builder
     private Point(Long id, Long userId, Long balance) {
         this.id = id;
@@ -41,5 +43,16 @@ public class Point {
             throw new RuntimeException("not enough point balance..");
         }
         this.balance -= useAmount;
+    }
+
+    public void reserveBalance(Long requestReserveBalance) {
+
+        long reservableBalance = this.balance - this.reservedBalance;
+
+        if (reservableBalance < requestReserveBalance) {
+            throw new RuntimeException("not enough point balance..");
+        }
+
+        this.reservedBalance += requestReserveBalance;
     }
 }
