@@ -14,7 +14,7 @@ public class ProductServiceProxy {
 
     private static final int TRY_COUNT = 3;
 
-    private final ProductService productService;
+    private final ProductService target;
 
     /**
      * 서로 다른 reservationId 를 가진 요청이지만, 동시에 같은 Product 를 업데이트하면
@@ -27,7 +27,7 @@ public class ProductServiceProxy {
 
         while (tryCount < TRY_COUNT) {
             try {
-                return productService.tryReserve(command);
+                return target.tryReserve(command);
             } catch (ObjectOptimisticLockingFailureException e) {
                 tryCount++;
             }
@@ -42,7 +42,7 @@ public class ProductServiceProxy {
 
         while (tryCount < TRY_COUNT) {
             try {
-                productService.confirmReserve(command);
+                target.confirmReserve(command);
                 return;
             } catch (ObjectOptimisticLockingFailureException e) {
                 tryCount++;
@@ -58,7 +58,7 @@ public class ProductServiceProxy {
 
         while (tryCount < TRY_COUNT) {
             try {
-                productService.cancelReserve(command);
+                target.cancelReserve(command);
                 return;
             } catch (ObjectOptimisticLockingFailureException e) {
                 tryCount++;

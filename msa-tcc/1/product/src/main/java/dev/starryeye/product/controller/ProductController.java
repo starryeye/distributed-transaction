@@ -30,7 +30,7 @@ public class ProductController {
          * 막을 수 있도록 분산락을 적용하였다.
          */
 
-        Boolean acquiredLock = lock.tryLock("product_reservation:", String.valueOf(request.reservationId()));
+        Boolean acquiredLock = lock.tryLock("product_reservation:", request.reservationId());
 
         if (!acquiredLock) {
             throw new RuntimeException("failed to acquire lock.. this is a duplicate request. another request is being processed.. reservationId = " + request.reservationId());
@@ -40,7 +40,7 @@ public class ProductController {
             ProductReserveResult result = productServiceProxy.tryReserve(request.toCommand());
             return ProductReserveResponse.of(result);
         } finally {
-            lock.unlock("product_reservation:", String.valueOf(request.reservationId()));
+            lock.unlock("product_reservation:", request.reservationId());
         }
     }
 
@@ -54,7 +54,7 @@ public class ProductController {
          * 그리고, 예약 단계, 예약 취소 단계와 동시에 실행되는 것을 방지하고자 예약 단계에서 사용된 key 를 사용한다.
          */
 
-        Boolean acquiredLock = lock.tryLock("product_reservation:", String.valueOf(request.reservationId()));
+        Boolean acquiredLock = lock.tryLock("product_reservation:", request.reservationId());
 
         if (!acquiredLock) {
             throw new RuntimeException("failed to acquire lock.. this is a duplicate request. another request is being processed.. reservationId = " + request.reservationId());
@@ -63,7 +63,7 @@ public class ProductController {
         try {
             productServiceProxy.confirmReserve(request.toCommand());
         } finally {
-            lock.unlock("product_reservation:", String.valueOf(request.reservationId()));
+            lock.unlock("product_reservation:", request.reservationId());
         }
     }
 
@@ -77,7 +77,7 @@ public class ProductController {
          * 그리고, 예약 단계, 예약 확정 단계와 동시에 실행되는 것을 방지하고자 예약 단계에서 사용된 key 를 사용한다.
          */
 
-        Boolean acquiredLock = lock.tryLock("product_reservation:", String.valueOf(request.reservationId()));
+        Boolean acquiredLock = lock.tryLock("product_reservation:", request.reservationId());
 
         if (!acquiredLock) {
             throw new RuntimeException("failed to acquire lock.. this is a duplicate request. another request is being processed.. reservationId = " + request.reservationId());
