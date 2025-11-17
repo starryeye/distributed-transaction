@@ -59,6 +59,15 @@ public class PointReservation {
         this.status = ReservationStatus.CONFIRMED;
     }
 
+    public void cancel() {
+
+        if (this.status == ReservationStatus.CONFIRMED) {
+            throw new RuntimeException("point reservation has been confirm, reservationId: " + this.reservationId + ", pointId: " + this.pointId);
+        }
+
+        this.status = ReservationStatus.CANCELLED;
+    }
+
     private enum ReservationStatus {
         RESERVED,
         CONFIRMED,

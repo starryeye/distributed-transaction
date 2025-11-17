@@ -1,6 +1,7 @@
 package dev.starryeye.point.application;
 
 import dev.starryeye.point.application.command.PointReserveCommand;
+import dev.starryeye.point.application.command.ReservedPointCancelCommand;
 import dev.starryeye.point.application.command.ReservedPointConfirmCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -42,6 +43,22 @@ public class PointServiceProxy {
         while (tryCount < TRY_COUNT) {
             try {
                 target.confirmReserve(command);
+                return;
+            } catch (ObjectOptimisticLockingFailureException e) {
+                tryCount++;
+            }
+        }
+
+        throw new RuntimeException("failed to reserve product.. failed to acquire optimistic lock..");
+    }
+
+    public void cancelReserve(ReservedPointCancelCommand command) {
+
+        int tryCount = 0;
+
+        while (tryCount < TRY_COUNT) {
+            try {
+                target.cancelReserve(command);
                 return;
             } catch (ObjectOptimisticLockingFailureException e) {
                 tryCount++;

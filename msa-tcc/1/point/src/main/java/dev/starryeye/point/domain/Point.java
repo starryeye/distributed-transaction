@@ -76,4 +76,13 @@ public class Point {
         this.balance -= requestConfirmBalance;
         this.reservedBalance -= requestConfirmBalance;
     }
+
+    public void cancelReservedBalance(Long requestCancelBalance) {
+
+        if (this.reservedBalance < requestCancelBalance) {
+            throw new RuntimeException("not enough point reservedBalance, pointId: " + this.id + ", balance: " + this.balance + ", reservedBalance: " + reservedBalance + ", requestConfirmBalance: " + requestCancelBalance);
+        }
+
+        this.reservedBalance -= requestCancelBalance;
+    }
 }
