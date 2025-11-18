@@ -32,7 +32,7 @@ public class ProductService {
                     .mapToLong(ProductReservation::getReservedPrice)
                     .sum();
 
-            return new ProductReserveResult(totalReservePrice);
+            return new ProductReserveResult(totalReservePrice); // 200 ok, 멱등성 보장
         }
 
         // 예약이 없음, 각 Product 별 예약 생성
@@ -72,7 +72,7 @@ public class ProductService {
                 .toList();
         if (!cancelledOrConfirmedReservations.isEmpty()) {
             System.out.println("there are cancelled or confirmed reservations, reservationId: " + command.reservationId());
-            return;
+            return; // 200 ok, 멱등성 보장
         }
 
         for (ProductReservation reservation : reservations) {
@@ -97,7 +97,8 @@ public class ProductService {
                 .filter(ProductReservation::isCancelledOrConfirmed)
                 .toList();
         if (!cancelledOrConfirmedReservations.isEmpty()) {
-            throw new RuntimeException("there are cancelled or confirmed reservations, reservationId: " + command.reservationId());
+            System.out.println("there are cancelled or confirmed reservations, reservationId: " + command.reservationId());
+            return; // 200 ok, 멱등성 보장
         }
 
         for (ProductReservation reservation : reservations) {

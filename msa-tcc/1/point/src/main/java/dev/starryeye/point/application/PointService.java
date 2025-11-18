@@ -23,7 +23,7 @@ public class PointService {
 
         if (pointReservationRepository.existsByReservationId(command.reservationId())) {
             System.out.println("reservation already exists, reservationId: " + command.reservationId());
-            return;
+            return; // 200 ok, 멱등성 보장
         }
 
         Point point = pointRepository.findByUserId(command.userId())
@@ -47,7 +47,7 @@ public class PointService {
 
         if (reservation.isNotReserved()) {
             System.out.println("there are cancelled or confirmed reservations, reservationId: " + command.reservationId());
-            return;
+            return; // 200 ok, 멱등성 보장
         }
 
         Point point = pointRepository.findById(reservation.getPointId())
@@ -65,7 +65,7 @@ public class PointService {
 
         if (reservation.isNotReserved()) {
             System.out.println("there are cancelled or confirmed reservations, reservationId: " + command.reservationId());
-            return;
+            return; // 200 ok, 멱등성 보장
         }
 
         Point point = pointRepository.findById(reservation.getPointId())
