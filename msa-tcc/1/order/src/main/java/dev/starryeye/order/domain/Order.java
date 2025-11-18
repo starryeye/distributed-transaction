@@ -44,8 +44,48 @@ public class Order {
         status = Status.COMPLETED;
     }
 
+    public void reserve() {
+
+        if (this.status != Status.CREATED) {
+            throw new RuntimeException("order can only be RESERVED during the CREATED phase, id: " + this.id + ", status: " + this.status);
+        }
+
+        this.status = Status.RESERVED;
+    }
+
+    public void cancel() {
+
+        if (this.status != Status.RESERVED) {
+            throw new RuntimeException("order can only be CANCELLED during the RESERVED phase, id: " + this.id + ", status: " + this.status);
+        }
+
+        this.status = Status.CANCELLED;
+    }
+
+    public void confirm() {
+
+        if (this.status != Status.RESERVED && this.status != Status.PENDING) {
+            throw new RuntimeException("order can only be CONFIRMED during the RESERVED or PENDING phase, id: " + this.id + ", status: " + this.status);
+        }
+
+        this.status = Status.CONFIRMED;
+    }
+
+    public void pending() {
+
+        if (this.status != Status.RESERVED) {
+            throw new RuntimeException("order can only be PENDING during the RESERVED phase, id: " + this.id + ", status: " + this.status);
+        }
+
+        this.status = Status.PENDING;
+    }
+
     private enum Status {
         CREATED,
+        RESERVED,
+        CANCELLED,
+        CONFIRMED,
+        PENDING,
         COMPLETED;
     }
 }

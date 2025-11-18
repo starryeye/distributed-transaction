@@ -2,6 +2,7 @@ package dev.starryeye.order.application;
 
 import dev.starryeye.order.application.command.CreateOrderCommand;
 import dev.starryeye.order.application.result.CreateOrderResult;
+import dev.starryeye.order.application.result.GetOrderItemsResult;
 import dev.starryeye.order.domain.Order;
 import dev.starryeye.order.domain.OrderItem;
 import dev.starryeye.order.infrastructure.OrderItemRepository;
@@ -32,5 +33,66 @@ public class OrderService {
         orderItemRepository.saveAll(orderItems);
 
         return new CreateOrderResult(order.getId());
+    }
+
+    @Transactional
+    public void tryReserve(Long orderId, Long requestCustomerId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("order not found, id: " + orderId));
+
+        if (!order.getCustomerId().equals(requestCustomerId)) {
+            throw new RuntimeException("customer id mismatch, orderId: " + orderId + ", customerId: " + order.getCustomerId() + ", requestCustomerId: " + requestCustomerId);
+        }
+
+        order.reserve();
+    }
+
+    @Transactional
+    public void cancelReserve(Long orderId, Long requestCustomerId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("order not found, id: " + orderId));
+
+        if (!order.getCustomerId().equals(requestCustomerId)) {
+            throw new RuntimeException("customer id mismatch, orderId: " + orderId + ", customerId: " + requestCustomerId + ", requestCustomerId: " + order.getCustomerId());
+        }
+
+        order.cancel();
+    }
+
+    @Transactional
+    public void confirmReserve(Long orderId, Long requestCustomerId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("order not found, id: " + orderId));
+
+        if (!order.getCustomerId().equals(requestCustomerId)) {
+            throw new RuntimeException("customer id mismatch, orderId: " + orderId + ", customerId: " + requestCustomerId + ", requestCustomerId: " + order.getCustomerId());
+        }
+
+        order.confirm();
+    }
+
+    @Transactional
+    public void pendingReserve(Long orderId, Long requestCustomerId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("order not found, id: " + orderId));
+
+        if (!order.getCustomerId().equals(requestCustomerId)) {
+            throw new RuntimeException("customer id mismatch, orderId: " + orderId + ", customerId: " + requestCustomerId + ", requestCustomerId: " + order.getCustomerId());
+        }
+
+        order.pending();
+    }
+
+    @Transactional(readOnly = true)
+    public GetOrderItemsResult getOrderItems(Long orderId) {
+
+        List<OrderItem> orderItems = orderItemRepository.findAllByOrderId(orderId);
+
+        return new GetOrderItemsResult(
+            orderItems.stream()
+                    .map(orderItem -> new GetOrderItemsResult.OrderItem(
+                            orderItem.getProductId(), orderItem.getOrderQuantity()
+                    )).toList()
+        );
     }
 }
