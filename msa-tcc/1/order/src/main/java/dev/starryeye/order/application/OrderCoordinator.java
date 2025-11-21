@@ -89,7 +89,32 @@ public class OrderCoordinator {
             orderService.confirmReserve(orderId, userId);
         } catch (Exception e) {
 
-            // PENDING 상태의 주문은 운영자가 수동으로 처리하도록 유도
+            /**
+             * PENDING case
+             *      1. 주문=PENDING, 상품재고=RESERVED, 포인트결제=RESERVED
+             *      2. 주문=PENDING, 상품재고=CONFIRMED, 포인트결제=RESERVED
+             *      3. 주문=PENDING, 상품재고=CONFIRMED, 포인트결제=CONFIRMED
+             *
+             * PENDING 상태의 주문을 처리하는 방식은 요구사항에 따라 매우 다를 수 있다.
+             *      유저가 주문을 했는데 상품재고, 포인트결제는 confirm 되었지만 주문이 pending 인데
+             *      막연히 pending 을 배치에 의해 confirm 처리하면 문제가 생김..
+             *          -> 유저가 다시 주문을 할 수도 있기 때문.
+             *
+             * CANCELLED case
+             *      1. 주문=CANCELLED, 상품재고=RESERVED, 포인트결제=RESERVED
+             *      2. 주문=CANCELLED, 상품재고=CANCELLED, 포인트결제=RESERVED
+             *      3. 주문=CANCELLED, 상품재고=CANCELLED, 포인트결제=CANCELLED (정상)
+             *
+             * CANCELLED 상태의 주문도 PENDING 과 마찬가지로 처리 방식이 다양할 수 있음..
+             *
+             * 아래는 어떤 요구사항이든 운영자가 수동으로 개입해서 비즈니스에 맞게 처리하는 것으로 공통적으로 처리할 수 있는 방법이다.
+             * PENDING 상태의 주문은 운영자가 수동으로 처리하도록 유도
+             *      PENDING 상태의 주문을 수집하는 application 을 두고 admin application 으로 처리 해주는 방법
+             * CANCELLED 상태의 주문
+             *      상품재고, 포인트결제 상태를 수집하는 application 을 두고 특정 기간이 지났음에도 RESERVED 로 남아 있는 자원이라면
+             *      주문 상태를 보고 CANCELLED 라면 스스로 CANCELLED 처리하도록 한다.
+             *
+             */
             orderService.pendingReserve(orderId, userId);
             throw e;
         }
