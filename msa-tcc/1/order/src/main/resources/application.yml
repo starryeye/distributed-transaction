@@ -25,3 +25,25 @@ spring:
 
 #logging.level.org.springframework.orm.jpa.JpaTransactionManager: DEBUG
 #logging.level.org.hibernate.resource.transaction: DEBUG
+
+
+resilience4j:
+  retry:
+    instances:
+      pointApiRetry:
+        maxAttempts: 3
+        waitDuration: 500ms
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+        retryExceptions:
+          - java.lang.Exception
+        ignoreExceptions:
+          -
+
+  circuitbreaker:
+    instances:
+      pointApi:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
+        automaticTransitionFromOpenToHalfOpenEnabled: true
