@@ -47,4 +47,9 @@ public class Product {
 
         this.stockQuantity -= orderQuantity;
     }
+
+    public void cancelReduceStock(Long orderQuantity) {
+
+        this.stockQuantity += orderQuantity;
+    }
 }
