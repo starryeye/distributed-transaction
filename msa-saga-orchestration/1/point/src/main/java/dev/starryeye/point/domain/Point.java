@@ -42,4 +42,8 @@ public class Point {
         }
         this.balance -= useAmount;
     }
+
+    public void cancelReduce(Long usedAmount) {
+        this.balance += usedAmount;
+    }
 }
