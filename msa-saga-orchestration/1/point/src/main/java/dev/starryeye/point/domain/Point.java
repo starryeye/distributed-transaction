@@ -20,11 +20,15 @@ public class Point {
 
     private Long balance; // 포인트 잔액
 
+    @Version
+    private Long version;
+
     @Builder
-    private Point(Long id, Long userId, Long balance) {
+    private Point(Long id, Long userId, Long balance, Long version) {
         this.id = id;
         this.userId = userId;
         this.balance = balance;
+        this.version = version;
     }
 
     public static Point create(Long userId, Long balance) {
@@ -32,6 +36,7 @@ public class Point {
                 .id(null)
                 .userId(userId)
                 .balance(balance)
+                .version(null)
                 .build();
     }
 
