@@ -25,3 +25,42 @@ spring:
 
 #logging.level.org.springframework.orm.jpa.JpaTransactionManager: DEBUG
 #logging.level.org.hibernate.resource.transaction: DEBUG
+
+
+# retry, circuitbreaker
+resilience4j:
+  retry:
+    instances:
+      pointApiRetry:
+        maxAttempts: 3
+        waitDuration: 500ms
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+        retryExceptions:
+          - java.lang.Exception
+        ignoreExceptions: # 재시도가 필요없는 예외
+          - org.springframework.web.client.HttpClientErrorException.NotFound
+          - org.springframework.web.client.HttpClientErrorException.BadRequest
+      productApiRetry:
+        maxAttempts: 3
+        waitDuration: 500ms
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+        retryExceptions:
+          - java.lang.Exception
+        ignoreExceptions: # 재시도가 필요없는 예외
+          - org.springframework.web.client.HttpClientErrorException.NotFound
+          - org.springframework.web.client.HttpClientErrorException.BadRequest
+
+  circuitbreaker:
+    instances:
+      pointApiCb:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+      productApiCb:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
+        automaticTransitionFromOpenToHalfOpenEnabled: true
