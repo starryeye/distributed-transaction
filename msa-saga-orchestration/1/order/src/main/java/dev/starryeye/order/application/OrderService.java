@@ -2,6 +2,7 @@ package dev.starryeye.order.application;
 
 import dev.starryeye.order.application.command.CreateOrderCommand;
 import dev.starryeye.order.application.result.CreateOrderResult;
+import dev.starryeye.order.application.result.GetOrderItemsResult;
 import dev.starryeye.order.domain.Order;
 import dev.starryeye.order.domain.OrderItem;
 import dev.starryeye.order.infrastructure.OrderItemRepository;
@@ -31,5 +32,42 @@ public class OrderService {
         orderItemRepository.saveAll(orderItems);
 
         return new CreateOrderResult(order.getId());
+    }
+
+    @Transactional
+    public void requestOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("order not found, orderId: " + orderId));
+
+        order.request();
+    }
+
+    @Transactional
+    public void completeRequestedOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("order not found, orderId: " + orderId));
+
+        order.complete();
+    }
+
+    @Transactional
+    public void failRequestedOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("order not found, orderId: " + orderId));
+
+        order.fail();
+    }
+
+    @Transactional(readOnly = true)
+    public GetOrderItemsResult getOrderItems(Long orderId) {
+
+        List<OrderItem> orderItems = orderItemRepository.findAllByOrderId(orderId);
+
+        return new GetOrderItemsResult(
+                orderItems.stream()
+                        .map(orderItem -> new GetOrderItemsResult.OrderItem(
+                                orderItem.getProductId(), orderItem.getOrderQuantity()
+                        )).toList()
+        );
     }
 }
