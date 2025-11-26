@@ -2,6 +2,8 @@ package dev.starryeye.order.application;
 
 import dev.starryeye.order.application.command.PlaceOrderCommand;
 import dev.starryeye.order.application.result.GetOrderItemsResult;
+import dev.starryeye.order.domain.CompensationRegistry;
+import dev.starryeye.order.infrastructure.CompensationRegistryRepository;
 import dev.starryeye.order.infrastructure.point.PointApiClient;
 import dev.starryeye.order.infrastructure.point.request.CancelUsedPointRequest;
 import dev.starryeye.order.infrastructure.point.request.UsePointRequest;
@@ -21,6 +23,8 @@ public class OrderCoordinator {
 
     private final ProductApiClient productApiClient;
     private final PointApiClient pointApiClient;
+
+    private final CompensationRegistryRepository compensationRegistryRepository;
 
     // 주문 처리
     public void placeOrder(PlaceOrderCommand command) {
@@ -58,21 +62,45 @@ public class OrderCoordinator {
 
         } catch (Exception e) {
             // 보상트랜잭션 처리
+            processCompensationTransaction(command.orderId(), e);
 
+            throw e;
+        }
+    }
+
+    public void processCompensationTransaction(Long orderId, Exception originalException) {
+
+        try {
             // 재고 차감 취소 요청
-            String boughtId = command.orderId().toString();
+            String boughtId = orderId.toString();
             CancelBoughtProductRequest cancelBoughtProductRequest = new CancelBoughtProductRequest(boughtId);
             CancelBoughtProductResponse cancelBoughtProductResponse = productApiClient.cancelBoughtProduct(cancelBoughtProductRequest);
 
             if (cancelBoughtProductResponse.cancelledTotalBoughtPrice() > 0) {
                 // 포인트 사용 취소 요청
-                String transactionId = command.orderId().toString();
+                String transactionId = orderId.toString();
                 CancelUsedPointRequest cancelUsedPointRequest = new CancelUsedPointRequest(transactionId);
                 pointApiClient.cancelUsedPoint(cancelUsedPointRequest);
             }
 
             // 주문을 실패 상태로 변경
-            orderService.failRequestedOrder(command.orderId());
+            orderService.failRequestedOrder(orderId);
+
+        } catch (Exception e) {
+
+            /**
+             * CompensationRegistry
+             * 보상트랜잭션이 실패할 경우 기록해두는 용이다.
+             *
+             * 주기적으로 CompensationRegistry 의 상태가 PENDING 인 데이터를 확인하는 application 을 두고
+             * 해당 application 이 보상트랜잭션을 처리해주고 처리가 완료되면 CompensationRegistry 상태를 COMPLETED 로 변경한다.
+             */
+
+            CompensationRegistry compensationRegistry = CompensationRegistry.createPending(orderId);
+            compensationRegistryRepository.save(compensationRegistry);
+
+            e.initCause(originalException);
+            throw e;
         }
     }
 }
