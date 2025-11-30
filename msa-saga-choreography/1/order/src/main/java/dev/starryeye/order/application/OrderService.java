@@ -7,8 +7,8 @@ import dev.starryeye.order.domain.Order;
 import dev.starryeye.order.domain.OrderItem;
 import dev.starryeye.order.infrastructure.OrderItemRepository;
 import dev.starryeye.order.infrastructure.OrderRepository;
-import dev.starryeye.order.infrastructure.producer.PlacedOrderEventProducer;
-import dev.starryeye.order.infrastructure.producer.event.PlacedOrderEvent;
+import dev.starryeye.order.infrastructure.producer.OrderPlacedEventProducer;
+import dev.starryeye.order.infrastructure.producer.event.OrderPlacedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +24,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
 
-    private final PlacedOrderEventProducer placedOrderEventProducer;
+    private final OrderPlacedEventProducer orderPlacedEventProducer;
 
     @Transactional
     public CreateOrderResult createOrder(CreateOrderCommand command) {
@@ -58,17 +58,17 @@ public class OrderService {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
-                PlacedOrderEvent placedOrderEvent = new PlacedOrderEvent(
+                OrderPlacedEvent orderPlacedEvent = new OrderPlacedEvent(
                         command.userId(),
                         command.orderId(),
                         orderItems.stream()
-                                .map(orderItem -> new PlacedOrderEvent.OrderItem(
+                                .map(orderItem -> new OrderPlacedEvent.OrderItem(
                                         orderItem.getProductId(),
                                         orderItem.getOrderQuantity()
                                 )).toList()
                 );
 
-                placedOrderEventProducer.send(placedOrderEvent);
+                orderPlacedEventProducer.send(orderPlacedEvent);
             }
         });
 
