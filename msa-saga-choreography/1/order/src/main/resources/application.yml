@@ -21,3 +21,12 @@ spring:
 
 #logging.level.org.springframework.orm.jpa.JpaTransactionManager: DEBUG
 #logging.level.org.hibernate.resource.transaction: DEBUG
+
+
+# kafka
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serializer.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+

@@ -44,8 +44,19 @@ public class Order {
         status = Status.COMPLETED;
     }
 
+    public void request() {
+
+        if (this.status != Status.CREATED) {
+            throw new RuntimeException("order can only be REQUESTED during the CREATED phase, id: " + this.id + ", status: " + this.status);
+        }
+
+        this.status = Status.REQUESTED;
+    }
+
     private enum Status {
         CREATED,
-        COMPLETED;
+        REQUESTED,
+        COMPLETED,
+        ;
     }
 }
