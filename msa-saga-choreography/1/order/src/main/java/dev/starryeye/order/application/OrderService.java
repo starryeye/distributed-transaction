@@ -53,7 +53,7 @@ public class OrderService {
 
         /**
          * order 가 처리되었다는 이벤트 발행.
-         * TransactionSynchronizationManager 를 이용하여 afterCommit 시점에 동작되도록 한다.
+         * TransactionSynchronizationManager 를 이용하여 placeOrder 에 걸린 transaction 기준으로 afterCommit 시점에 동작되도록 한다.
          */
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
