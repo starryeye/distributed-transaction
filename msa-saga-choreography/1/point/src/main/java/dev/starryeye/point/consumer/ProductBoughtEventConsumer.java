@@ -1,10 +1,13 @@
 package dev.starryeye.point.consumer;
 
 import dev.starryeye.point.application.PointService;
+import dev.starryeye.point.application.command.CancelUsedPointCommand;
 import dev.starryeye.point.application.command.UsePointCommand;
 import dev.starryeye.point.consumer.event.ProductBoughtEvent;
+import dev.starryeye.point.infrastructure.producer.PointUsedFailedEventProducer;
 import dev.starryeye.point.infrastructure.producer.PointUsedEventProducer;
 import dev.starryeye.point.infrastructure.producer.event.PointUsedEvent;
+import dev.starryeye.point.infrastructure.producer.event.PointUsedFailedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -16,6 +19,7 @@ public class ProductBoughtEventConsumer {
     private final PointService pointService;
 
     private final PointUsedEventProducer pointUsedEventProducer;
+    private final PointUsedFailedEventProducer pointUsedFailedEventProducer;
 
     @KafkaListener(
             topics = "product-bought",
@@ -43,10 +47,13 @@ public class ProductBoughtEventConsumer {
             pointUsedEventProducer.send(pointUsedEvent);
         } catch (Exception ex) {
 
-            // point 결제 취소
+            // point 결제 취소 (멱등성)
+            CancelUsedPointCommand cancelUsedPointCommand = new CancelUsedPointCommand(transactionId);
+            pointService.cancelUse(cancelUsedPointCommand);
 
-
+            // "결제됨 이벤트 취소" 이벤트 발행
+            PointUsedFailedEvent pointUsedFailedEvent = new PointUsedFailedEvent(event.orderId());
+            pointUsedFailedEventProducer.send(pointUsedFailedEvent);
         }
-
     }
 }
