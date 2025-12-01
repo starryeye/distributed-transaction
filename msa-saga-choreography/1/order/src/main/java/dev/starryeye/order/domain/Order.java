@@ -55,7 +55,7 @@ public class Order {
 
     private enum Status {
         CREATED,
-        REQUESTED,
+        REQUESTED, // placeOrder 상태를 의미한다.
         COMPLETED,
         ;
     }

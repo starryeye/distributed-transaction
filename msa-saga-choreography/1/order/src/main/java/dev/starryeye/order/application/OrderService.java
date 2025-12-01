@@ -48,7 +48,7 @@ public class OrderService {
                 .orElseThrow(() -> new RuntimeException("order not found, orderId: " + command.orderId()));
         List<OrderItem> orderItems = orderItemRepository.findAllByOrderId(order.getId());
 
-        // order 의 상태를 REQUESTED 로 변경한다.
+        // order 의 상태를 REQUESTED 로 변경한다. (placeOrder 상태를 의미한다.)
         order.request();
 
         /**

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class OrderPlacedEventProducer { // todo, RequestedOrderEventProducer rename 고려..
+public class OrderPlacedEventProducer {
 
     private final KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
 
