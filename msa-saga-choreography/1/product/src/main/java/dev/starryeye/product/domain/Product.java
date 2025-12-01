@@ -20,11 +20,15 @@ public class Product {
 
     private Long price; // 가격
 
+    @Version // 낙관적 락 exception 처리(재시도)는 하지 않았지만, 동시성 문제 및 두번 갱실 분실 문제를 회피하기 위해 도입
+    private Long version;
+
     @Builder
-    private Product(Long id, Long stockQuantity, Long price) {
+    private Product(Long id, Long stockQuantity, Long price, Long version) {
         this.id = id;
         this.stockQuantity = stockQuantity;
         this.price = price;
+        this.version = version;
     }
 
     public static Product create(Long stockQuantity, Long price) {
@@ -32,6 +36,7 @@ public class Product {
                 .id(null)
                 .stockQuantity(stockQuantity)
                 .price(price)
+                .version(null)
                 .build();
     }
 
