@@ -62,6 +62,10 @@ public class Order {
         this.status = Status.FAILED;
     }
 
+    public String getStatus() {
+        return status.name();
+    }
+
     private enum Status {
         CREATED,
         REQUESTED, // placeOrder 상태를 의미한다.

@@ -2,6 +2,7 @@ package dev.starryeye.order.application;
 
 import dev.starryeye.order.application.command.CreateOrderCommand;
 import dev.starryeye.order.application.command.PlaceOrderCommand;
+import dev.starryeye.order.application.query.GetOrderStatusQuery;
 import dev.starryeye.order.application.result.CreateOrderResult;
 import dev.starryeye.order.domain.Order;
 import dev.starryeye.order.domain.OrderItem;
@@ -90,5 +91,14 @@ public class OrderService {
                 .orElseThrow(() -> new RuntimeException("order not found, orderId: " + orderId));
 
         order.complete();
+    }
+
+    @Transactional(readOnly = true)
+    public String getOrderStatus(GetOrderStatusQuery query) {
+
+        Order order = orderRepository.findByIdAndCustomerId(query.orderId(), query.userId())
+                .orElseThrow(() -> new RuntimeException("order not found, orderId: " + query.orderId() + ", customerId: " + query.userId()));
+
+        return order.getStatus();
     }
 }
