@@ -59,7 +59,7 @@ public class OrderPlacedEventConsumer {
             CancelBoughtProductCommand cancelBoughtProductCommand = new CancelBoughtProductCommand(boughtId);
             CancelBoughtProductResult result = productService.cancelBuying(cancelBoughtProductCommand);
 
-            // "구매됨 이벤트를 실패" 이벤트 발행
+            // "구매됨 이벤트가 실패됨" 이벤트 발행
             ProductBoughtFailedEvent productBoughtFailedEvent = new ProductBoughtFailedEvent(
                     event.orderId(),
                     result.cancelledTotalBoughtPrice()
