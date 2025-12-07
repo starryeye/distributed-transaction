@@ -24,7 +24,7 @@ public class ProductService {
     @Transactional
     public BuyProductResult buy(BuyProductCommand command) {
 
-        List<ProductBoughtHistory> boughtHistories = productBoughtHistoryRepository.findAllByBoughtIdAndStatus(
+        List<ProductBoughtHistory> boughtHistories = productBoughtHistoryRepository.findAllByBoughtIdAndType(
                 command.boughtId(),
                 ProductBoughtHistory.Type.BOUGHT
         );
@@ -67,7 +67,7 @@ public class ProductService {
     @Transactional
     public CancelBoughtProductResult cancelBuying(CancelBoughtProductCommand command) {
 
-        List<ProductBoughtHistory> boughtHistories = productBoughtHistoryRepository.findAllByBoughtIdAndStatus(
+        List<ProductBoughtHistory> boughtHistories = productBoughtHistoryRepository.findAllByBoughtIdAndType(
                 command.boughtId(),
                 ProductBoughtHistory.Type.BOUGHT
         );
@@ -77,7 +77,7 @@ public class ProductService {
             return new CancelBoughtProductResult(0L);
         } // 멱등성
 
-        List<ProductBoughtHistory> cancelledBoughtHistories = productBoughtHistoryRepository.findAllByBoughtIdAndStatus(
+        List<ProductBoughtHistory> cancelledBoughtHistories = productBoughtHistoryRepository.findAllByBoughtIdAndType(
                 command.boughtId(),
                 ProductBoughtHistory.Type.CANCELLED
         );

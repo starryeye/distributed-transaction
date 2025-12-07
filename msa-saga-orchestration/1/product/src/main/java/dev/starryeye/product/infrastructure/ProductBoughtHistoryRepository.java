@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface ProductBoughtHistoryRepository extends JpaRepository<ProductBoughtHistory, Long> {
 
-    List<ProductBoughtHistory> findAllByBoughtIdAndStatus(String boughtId, ProductBoughtHistory.Type type);
+    List<ProductBoughtHistory> findAllByBoughtIdAndType(String boughtId, ProductBoughtHistory.Type type);
 }
