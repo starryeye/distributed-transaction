@@ -11,7 +11,7 @@ spring:
     hibernate:
       ddl-auto: create
     show-sql: true
-    #    defer-datasource-initialization: true # data.sql 을 Hibernate 스키마 생성 이후에 실행
+    defer-datasource-initialization: true # data.sql 을 Hibernate 스키마 생성 이후에 실행
     properties:
       hibernate:
         highlight_sql: true
@@ -21,10 +21,10 @@ spring:
     redis:
       host: localhost
       port: 6379
-#  sql:
-#    init:
-#      mode: always
-#      data-locations: classpath:sql/data.sql
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:sql/data.sql
 
 #logging.level.org.springframework.orm.jpa.JpaTransactionManager: DEBUG
 #logging.level.org.hibernate.resource.transaction: DEBUG

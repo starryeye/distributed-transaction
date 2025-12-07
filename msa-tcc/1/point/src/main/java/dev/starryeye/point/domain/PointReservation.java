@@ -23,6 +23,7 @@ public class PointReservation {
 
     private Long reservedBalance;
 
+    @Enumerated(EnumType.STRING)
     private ReservationStatus status;
 
     @Builder
