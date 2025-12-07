@@ -11,6 +11,14 @@
 - try, cancel api 를 새로 신설하며, db 에도 자원을 임시 예약 할 수 있도록 table 및 column 을 추가해줘야한다.
 - order application 에서는 coordinator 를 두고 3개의 도메인 TCC 를 조율하는 코드를 개발
 
+### DB
+- order
+	- <img width="599" height="342" alt="Image" src="https://github.com/user-attachments/assets/67b315d0-1d23-492b-b852-d44fd0b76315" />
+- product
+	- <img width="470" height="441" alt="image" src="https://github.com/user-attachments/assets/de95e335-2287-4533-85f2-930eda1819f5" />
+- point
+	- <img width="290" height="444" alt="image" src="https://github.com/user-attachments/assets/08124a7a-48fd-48b8-8763-2b7acadef335" />
+
 ### monolithic 과 비교
 - monolithic 에서는 데이터베이스에서 제공하는 트랜잭션 기능을 사용하여 rollback, commit 에 의존하던 것을 MSA 구조에서는 application layer 에서 논리적으로 구현하여 관리하도록 한다.(Try, Confirm, Cancel)
 
