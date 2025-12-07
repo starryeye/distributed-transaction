@@ -1,0 +1,30 @@
+### 주문 생성
+POST http://localhost:8080/order/new
+Content-Type: application/json
+X-User-Id: 1
+
+{
+  "orderItems": [
+    {
+      "productId": 1,
+      "orderQuantity": 10
+    },
+    {
+      "productId": 2,
+      "orderQuantity": 20
+    }
+  ]
+}
+
+### 주문 처리
+POST localhost:8080/order/place
+Content-Type: application/json
+X-User-Id: 1
+
+{
+  "orderId": 1
+}
+
+### 주문 상태 조회
+GET localhost:8080/order/1/status
+X-User-Id: 1
