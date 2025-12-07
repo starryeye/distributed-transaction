@@ -73,4 +73,13 @@ public class OrderService {
         });
 
     }
+
+    @Transactional
+    public void failOrder(Long orderId) {
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("order not found, orderId: " + orderId));
+
+        order.fail();
+    }
 }

@@ -53,10 +53,20 @@ public class Order {
         this.status = Status.REQUESTED;
     }
 
+    public void fail() {
+
+        if (this.status != Status.REQUESTED) {
+            throw new RuntimeException("order can only be FAILED during the REQUESTED phase, id: " + this.id + ", status: " + this.status);
+        }
+
+        this.status = Status.FAILED;
+    }
+
     private enum Status {
         CREATED,
         REQUESTED, // placeOrder 상태를 의미한다.
         COMPLETED,
+        FAILED
         ;
     }
 }
