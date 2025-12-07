@@ -9,6 +9,33 @@ distributed-transaction
 - msa
   - MSA 아키텍처에서 분산트랜잭션을 알아본다.
 
+## dependency
+- monolithic-1
+  - spring web
+  - spring data jpa, mysql
+- monolithic-2
+  - spring web
+  - spring data jpa, mysql
+- monolithic-3
+  - spring web
+  - spring data jpa, mysql
+  - spring data redis, redis
+- msa-tcc-1
+  - spring web
+  - spring cloud, circuitbreaker-resilience4j
+  - spring data jpa, mysql
+  - spring data redis, redis
+- msa-saga-orchestration-1
+  - spring web
+  - spring cloud, circuitbreaker-resilience4j
+  - spring data jpa, mysql
+  - spring data redis, redis
+- msa-saga-choreography-1
+  - spring web
+  - spring data jpa, mysql
+  - spring data redis, redis
+  - spring kafka, kafka
+
 ## requirements
 - Order, 주문 기능
 - Product, 재고 관리 기능
