@@ -1,0 +1,102 @@
+# docker compose -p msa-saga-choreography-1-services up -d
+services:
+  order-database-service:
+    container_name: order-mysql-container
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: secret-root
+      MYSQL_DATABASE: order-db
+      MYSQL_USER: user-app
+      MYSQL_PASSWORD: secret-app
+    volumes:
+      - ./order_mysql_data:/var/lib/mysql
+    ports:
+      - 3306:3306
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping"]
+      interval: 10s
+      retries: 10
+  product-database-service:
+    container_name: product-mysql-container
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: secret-root
+      MYSQL_DATABASE: product-db
+      MYSQL_USER: user-app
+      MYSQL_PASSWORD: secret-app
+    volumes:
+      - ./product_mysql_data:/var/lib/mysql
+    ports:
+      - 3307:3306
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping" ]
+      interval: 10s
+      retries: 10
+  point-database-service:
+    container_name: point-mysql-container
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: secret-root
+      MYSQL_DATABASE: point-db
+      MYSQL_USER: user-app
+      MYSQL_PASSWORD: secret-app
+    volumes:
+      - ./point_mysql_data:/var/lib/mysql
+    ports:
+      - 3308:3306
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping" ]
+      interval: 10s
+      retries: 10
+
+  cache-service:
+    container_name: redis-container
+    image: redis
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      retries: 10
+
+  event-queue-service:
+    image: bitnami/kafka:3.8.0
+    container_name: kafka
+    ports:
+      - "9092:9092"   # Producer/Consumer용 (앱이 연결하는 포트)
+      - "9093:9093"   # Controller용 (KRaft 내부 통신)
+    environment:
+      # KRaft 기본 설정
+      - KAFKA_ENABLE_KRAFT=yes
+      - KAFKA_KRAFT_CLUSTER_ID=abcdefghijklmnopqrstuv
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+
+      # 리스너 설정
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+
+      # 편의 설정
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+    healthcheck:
+      test: [ "CMD-SHELL", "kafka-topics.sh --bootstrap-server localhost:9092 --list" ]
+      interval: 10s
+      timeout: 10s
+      retries: 15
+
+  event-queue-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - "9090:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    depends_on:
+      kafka:
+        condition: service_healthy
