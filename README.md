@@ -8,6 +8,10 @@ distributed-transaction
   - 모놀리식 아키텍처에서 트랜잭션을 알아본다.
 - msa
   - MSA 아키텍처에서 분산트랜잭션을 알아본다.
+  - 2PC
+  - TCC
+  - Saga pattern, orchestration
+  - Saga pattern, choreography
 
 ## dependency
 - monolithic-1
