@@ -60,8 +60,8 @@ services:
       retries: 10
 
   event-queue-service:
-    image: bitnami/kafka:3.8.0
-    container_name: kafka
+    image: bitnami/kafka:3.7
+    container_name: kafka-container
     ports:
       - "9092:9092"   # Producer/Consumer용 (앱이 연결하는 포트)
       - "9093:9093"   # Controller용 (KRaft 내부 통신)
@@ -90,7 +90,7 @@ services:
       retries: 15
 
   event-queue-ui:
-    container_name: kafka-ui
+    container_name: kafka-ui-container
     image: provectuslabs/kafka-ui:latest
     ports:
       - "9090:8080"
@@ -98,5 +98,5 @@ services:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
     depends_on:
-      kafka:
+      event-queue-service:
         condition: service_healthy
