@@ -8,8 +8,9 @@
 - Orchestration 방식, Choreography 방식이 존재한다.
 
 ### MSA, Saga pattern - choreography
-- orchestration 방식과 다르게.. coordinator 없이 각 서비스가 이벤트를 발행하고 필요한 이벤트를 구독하여
+- orchestration 방식과 다르게.. coordinator 없이 각 서비스가 이벤트를 발행하고 필요한 이벤트를 구독하여  
 이를 통해 전체 트랜잭션의 흐름을 제어하는 방식이다.
+- 개별트랜잭션의 처리시간이 길고 EDD 방식에서 많이 사용된다.
 
 ### 구현
 - 
