@@ -8,7 +8,8 @@
 - Orchestration 방식, Choreography 방식이 존재한다.
 
 ### MSA, Saga pattern - choreography
-- 
+- orchestration 방식과 다르게.. coordinator 없이 각 서비스가 이벤트를 발행하고 필요한 이벤트를 구독하여
+이를 통해 전체 트랜잭션의 흐름을 제어하는 방식이다.
 
 ### 구현
 - 
@@ -17,4 +18,7 @@
 - 
 
 ### 장단점
--
+- 장점
+  - 이벤트 기반으로 구현을 하므로 서비스간 결합도가 낮다.
+- 단점
+  - coordinator 와 같이 전체 흐름을 파악할 수 있는 부분이 없어서 전체 흐름을 파악하기 힘들 수 있음
