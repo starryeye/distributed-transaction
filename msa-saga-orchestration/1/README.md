@@ -8,10 +8,11 @@
 - Orchestration 방식, Choreography 방식이 존재한다.
 
 ### MSA, Saga pattern - orchestration
-- 
+- TCC 와 비슷하게 하나의 중앙관리자(coordinator or orchestrator)가 전체 흐름을 제어한다.
 
 ### 구현
-- 
+- coordinator 가 각 서비스에 순차적으로 요청(개별트랜잭션 수행 명령)을 보내고 작업 결과를 확인하면서 성공여부에 따라
+다음 단계를 수행하거나 보상트랜잭션을 수행하는 구조로 구현된다.
 
 ### DB
 - order
@@ -25,4 +26,8 @@
 - 
 
 ### 장단점
--
+- 장점
+  - coordinator 를 보면 전체 흐름을 파악하기 쉽기 때문에 구현 난이도와 유지보수 난이도가 낮다.
+- 단점
+  - 시간이 지날수록 coordinator 의 복잡성이 증가할 수 있음
+  - 서비스간 결합도가 높음
