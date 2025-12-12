@@ -5,6 +5,7 @@
 	- Confirm : 트랜잭션 처리가 완료되고 실제 리소스를 확정 처리하여 반영한다.
 	- Cancel : 트랜잭션 처리 중 문제가 발생한 경우, 예약 상태를 취소하고 원복한다.
 - Try, Confirm, Cancel 단계는 멱등하게 설계되어야한다.
+- 실무에서는.. 강한 정합성이 필요한 경우에 아주 제한적으로 사용된다.
 
 ### 구현
 - order, product, point 3개의 application 간에 핵심 api 는 confirm 단계로 생각하면되고
